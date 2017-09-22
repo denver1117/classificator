@@ -2,12 +2,13 @@
 Run setup
 """
 
-from setuptools import setup
+from distutils.core import setup
 
 setup(name='classificator',
       version='0.1',
       description='Text classification automation tool',
       url='https://github.com/denver1117/classificator',
+      download_url='https://github.com/denver1117/classificator/archive/0.1.tar.gz',
       author='Evan Harris',
       author_email='emitchellh@gmail.com',
       license='MIT',
