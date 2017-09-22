@@ -1,6 +1,6 @@
 {
     "data_specs": {
-        "loc": "file_uploads/tickers.tsv", 
+        "loc": "doc/data/tickers.tsv", 
         "label_column": "CapBucket_Label", 
         "feature_columns": ["Industry", "Sector"], 
         "feature_methods": ["vectorize", "encode"], 
