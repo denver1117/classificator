@@ -4,7 +4,7 @@
 
 -----------------
 
-# Classificator : a convenience wrapper for classification methods in Python's scikit-learn
+# classificator : a convenience wrapper for classification methods in Python's scikit-learn
 
 ### About
 The Classificator is a wrapper around scikit-learn’s classification suite, whose primary function is to normalize and automate the process by which common machine learning classification models are trained and validated. This is specifically in the context of text feature spaces, which require NLP techniques for preprocessing and vectorization. There is an additional focus on group cross validation, where labeled groups exist as data features, and variance is known to be smaller within groups. 
