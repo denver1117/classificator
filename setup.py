@@ -14,10 +14,9 @@ setup(name='classificator',
       license='MIT',
       packages=['classificator'],
       install_requires=[
-          'pandas==0.18.0',
-          'numpy==1.13.1',
-          'scipy==0.17.0',
-          'scikit-learn==0.18.2',
-          'boto3==1.4.0'
-      ],
-      zip_safe=False)
+          'pandas>=0.18.0',
+          'numpy>=1.13.1',
+          'scipy>=0.17.0',
+          'scikit-learn>=0.18.2',
+          'boto3>=1.4.0'
+      ])
