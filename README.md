@@ -30,7 +30,7 @@ Train and validate various model choices
 ### Installation
 
 Source Code: https://github.com/denver1117/classificator <br>
-Package Index: https://pypi.python.org/pypi?name=classificator&version=0.1&:action=display
+Package Index: https://pypi.python.org/pypi/classificator
 
 Binary installers for the latest released version are available at the Python package index:
 
