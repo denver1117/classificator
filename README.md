@@ -87,3 +87,11 @@ pip install classificator
     clf.choose_model()
 ```
 will build out a text pre-processing pipeline using a `TF-IDF Vectorizer` (with the supplied parameters) for the column `Industry` and a OneHotEncoder for the column `Sector` in order to predict classes `CapBucket_Label`, with data located here: `doc/data/tickers.tsv`.  It will send logging, validation metrics, and a pickled model object here: `tmp`.  It will select features from the vectorized data using Chi-Squared feature selection, attemtping multiple alpha values in grid search.  It will run separate grid search processes for a `Decision Tree` and for a `Logistic Regression` using the same pre-processing pipeline.  The best model will be chosen by the best `Accuracy` score among parameter maps across classifier choices.  
+
+### Authors
+
+Evan Harris - Initial work began at [Return Path](https://returnpath.com/)
+
+### License
+
+This project is licensed under the MIT License - see the LICENSE file for details
