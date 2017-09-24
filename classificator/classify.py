@@ -246,7 +246,7 @@ class Classificator(ClassificatorBase):
             if method == "vectorize":
                 tf = models.vectorizers[self.config["vectorizer"]["model"]](
                     **self.config["vectorizer"]["args"])
-                tf.fit([x[col] if (x[col] and ~pd.isnull(x[col]) and x[col] != np.nan) else "" for x in X])
+                tf.fit([force_str(x[col]) for x in X])
                 vec = Vec_(tf)
             else:
                 vec = None
@@ -498,7 +498,7 @@ class MultiTextVectorizer(TransformerMixin, BaseEstimator):
         if method == "numeric":
             return [x[col] if ~pd.isnull(x[col]) else 0.0 for x in X]
         else:
-            return [x[col] if (x[col] and ~pd.isnull(x[col]) and x[col] != np.nan) else "" for x in X]
+            return [force_str(x[col]) for x in X]
 
 class Normify(TransformerMixin, BaseEstimator):    
     """ Apply Normalize and/or Standardize transformers """
@@ -625,6 +625,17 @@ class Vec_(TransformerMixin):
 ###########################################
 ### Utility Functions for Classificator ###
 ###########################################
+
+def force_str(x):
+    """ Force string """
+
+    try:
+        return str(x)
+    except:
+        try:
+            return "".join(i for i in x if ord(i)<128)
+        except:
+            return ""
 
 def load_sklearn_dataset(name):
     """ Load dataset from sklearn and return as pandas dataframe """
