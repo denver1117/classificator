@@ -3,7 +3,7 @@ Run setup
 """
 
 from setuptools import setup, find_packages
-from predictor import __version__
+from classificator import __version__
 
 setup(name='classificator',
       version=__version__,
