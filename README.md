@@ -6,6 +6,33 @@
 
 # classificator : a convenience wrapper for classification methods in Python's scikit-learn
 
+<table>
+<tr>
+  <td>Latest Release</td>
+  <td>
+    <a href="https://pypi.org/project/classificator/">
+    <img src="https://img.shields.io/pypi/v/classificator.svg" alt="latest release" />
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>License</td>
+  <td>
+    <a href="https://github.com/denver1117/classificator/blob/master/LICENSE">
+    <img src="https://img.shields.io/pypi/l/classificator.svg" alt="license" />
+    </a>
+</td>
+</tr>
+<tr>
+  <td>Build Status</td>
+  <td>
+    <a href="https://travis-ci.org/denver1117/classificator">
+    <img src="https://travis-ci.org/denver1117/classificator.svg?branch=master" alt="travis build status" />
+    </a>
+  </td>
+</tr>
+</table>
+
 ### About
 The classificator is a wrapper around scikit-learn’s classification suite, whose primary function is to normalize and automate the process by which common machine learning classification models are trained and validated. This is specifically in the context of text feature spaces, which require NLP techniques for preprocessing and vectorization. There is an additional focus on group cross validation, where labeled groups exist as data features, and variance is known to be smaller within groups. 
 
