@@ -6,14 +6,12 @@ import json
 import uuid
 import pandas as pd
 import numpy as np
-import models
 import boto3
 import pickle
 import datetime
 import os
 import shutil
 
-from combined import CombinedEstimator
 from scipy.sparse import hstack, csr_matrix
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import (
@@ -28,6 +26,16 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score, classification_report, 
     roc_auc_score)
+from functools import reduce
+
+from .combined import CombinedEstimator
+from .models import (
+    scores, vectorizers, feature_selectors, 
+    require_dense, pre_processors, 
+    classifiers, datasets
+    )
+
+__all__ = ["Classificator"]
 
 # directory names
 logdir = "/tmp"
@@ -143,22 +151,22 @@ class Classificator(ClassificatorBase):
         # Iterate through model choices, fitting a 
         # GridSearchCV model for each
         model_list = []
-        scores = []
+        scores_ = []
         for index in range(len(self.pipelines)):
-            self.realtimelog(self.config["classifiers"].keys()[index], stage=stage)
+            self.realtimelog(list(self.config["classifiers"].keys())[index], stage=stage)
             scoring = None
             if "score" in self.config["meta_specs"]:     
-                scoring = models.scores[self.config["meta_specs"]["score"]]
+                scoring = scores[self.config["meta_specs"]["score"]]
             model = self._model_selection(
                 X_train, y_train, self.pipelines[index], 
                 self.grids[index], groups=groups_train, 
                 k=self.config["meta_specs"]["k"],
                 scoring=scoring)
-            scores.append(model.best_score_)
+            scores_.append(model.best_score_)
             model_list.append(model)
             self.realtimelog("CV score: {0}".format(model.best_score_), stage=stage)
             filename = "{0}_{1}.tsv".format(
-                self.config["classifiers"].keys()[index].lower().replace(" ", "_"), 
+                list(self.config["classifiers"].keys())[index].lower().replace(" ", "_"), 
                 stage)
             pd.DataFrame(model.cv_results_).to_csv(
                 "{0}/{1}".format(tmpdir, filename), 
@@ -166,10 +174,10 @@ class Classificator(ClassificatorBase):
             self._write(filename)
 
         # Choose winner
-        winner_index = np.argmax(scores)
+        winner_index = np.argmax(scores_)
         winner = model_list[winner_index].best_estimator_
         self.realtimelog("Best model type: {0}".format(
-            self.config["classifiers"].keys()[winner_index]), stage=stage)
+            list(self.config["classifiers"].keys())[winner_index]), stage=stage)
 
         # Get and write model validation statistics
         self.get_stats(winner, X_test, y_test, stage=stage)
@@ -201,7 +209,7 @@ class Classificator(ClassificatorBase):
 
         # Get accuracy score and classification report
         acc = accuracy_score(y_test, y_pred)
-        clf_report = classification_report(y_test, y_pred)
+        clf_report = classification_report(y_test, y_pred, labels=np.unique(y_pred))
         clf_report_name = "clf_report_{0}.tsv".format(stage)
         classifaction_report_df(clf_report).to_csv(
                 "{0}/{1}".format(tmpdir, clf_report_name),
@@ -244,7 +252,7 @@ class Classificator(ClassificatorBase):
         for col in range(len(self.config["data_specs"]["feature_methods"])):
             method = self.config["data_specs"]["feature_methods"][col]
             if method == "vectorize":
-                tf = models.vectorizers[self.config["vectorizer"]["model"]](
+                tf = vectorizers[self.config["vectorizer"]["model"]](
                     **self.config["vectorizer"]["args"])
                 tf.fit([force_str(x[col]) for x in X])
                 vec = Vec_(tf)
@@ -283,7 +291,7 @@ class Classificator(ClassificatorBase):
         """ Loads and formats input data and performs train/test split """
 
         # Load from sklearn datasets or custom file source
-        if self.config["data_specs"]["loc"].lower() in models.datasets.keys():
+        if self.config["data_specs"]["loc"].lower() in datasets.keys():
             df = load_sklearn_dataset(self.config["data_specs"]["loc"].lower())
         else:
             if ("sep" in self.config["data_specs"].keys()) and (self.config["data_specs"]["sep"] != ""):
@@ -332,7 +340,7 @@ class Classificator(ClassificatorBase):
 
         self.pipelines = []
         for clf in self.config["classifiers"].keys():
-            self.pipelines.append(self._assemble_pipeline(models.classifiers[clf](), clf))
+            self.pipelines.append(self._assemble_pipeline(classifiers[clf](), clf))
 
     def _assemble_pipeline(self, clf, clf_name):
         """ 
@@ -344,13 +352,13 @@ class Classificator(ClassificatorBase):
             return clf
 
         if "selector" in self.config.keys():
-            selector = models.feature_selectors[self.config["selector"]["model"]]
+            selector = feature_selectors[self.config["selector"]["model"]]
         else:    
             selector = None
         mtv = MultiTextVectorizer(
             self.config, 
             selector=selector)
-        if clf_name in models.require_dense:
+        if clf_name in require_dense:
             clf_steps = [("densify", Densify()), ("clf", clf)]
         else:
             clf_steps = [("clf", clf)]
@@ -513,7 +521,7 @@ class Normify(TransformerMixin, BaseEstimator):
 
         self.models = []
         for method in self.methods:
-            proc = models.pre_processors[method]
+            proc = pre_processors[method]
             if method == "Standard Scaler":
                 self.models.append(proc(with_mean=False))
             else:
@@ -590,7 +598,7 @@ class Encoder(TransformerMixin):
         """ Fit label encoder and onehot encoder"""
 
         self.label = LabelEncoder()
-        self.onehot = OneHotEncoder()
+        self.onehot = OneHotEncoder(categories='auto')
         self.onehot.fit([[x] for x in self.label.fit_transform(X)])
         return self
 
@@ -641,13 +649,13 @@ def load_sklearn_dataset(name):
     """ Load dataset from sklearn and return as pandas dataframe """
 
     if name in ["iris"]:
-        data = models.datasets[name]() 
+        data = datasets[name]() 
         df = (
             pd.DataFrame(
                 np.hstack([data.data, [[x] for x in data.target]]), 
                 columns=(list(data.feature_names) + ["label"])))
     elif name in ["newsgroups"]:
-        data = models.datasets[name](subset='train', remove=('headers', 'footers', 'quotes'))
+        data = datasets[name](subset='train', remove=('headers', 'footers', 'quotes'))
         df = pd.DataFrame(
             np.hstack([[[x] for x in data.data], [[x] for x in data.target]]), 
             columns=["text", "label"]).sample(1000, random_state=10) 

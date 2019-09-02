@@ -2,17 +2,18 @@
 Run setup
 """
 
-from distutils.core import setup
+from setuptools import setup, find_packages
+from predictor import __version__
 
 setup(name='classificator',
-      version='0.1.3',
+      version=__version__,
       description='Text classification automation tool',
       url='https://github.com/denver1117/classificator',
-      download_url='https://github.com/denver1117/classificator/archive/0.1.tar.gz',
+      download_url='https://pypi.org/project/classificator/#files',
       author='Evan Harris',
       author_email='emitchellh@gmail.com',
       license='MIT',
-      packages=['classificator'],
+      packages=find_packages(),
       install_requires=[
           'pandas>=0.18.0',
           'numpy>=1.13.1',

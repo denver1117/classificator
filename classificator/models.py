@@ -13,8 +13,20 @@ import sklearn.feature_selection
 import sklearn.svm
 import sklearn.metrics
 import sklearn.neighbors
+
 from sklearn.datasets import load_iris, fetch_20newsgroups
-from combined import CombinedEstimator
+
+from .combined import CombinedEstimator
+
+__all__ = [
+    "classifiers", 
+    "vectorizers", 
+    "pre_processors", 
+    "feature_selectors", 
+    "scores", 
+    "datasets", 
+    "require_dense"
+    ]
 
 classifiers = {
     "Random Forest": sklearn.ensemble.RandomForestClassifier,

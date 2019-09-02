@@ -15,6 +15,6 @@
     "pre_processors": {"methods": [[]]},
     "classifiers": {
         "Decision Tree": {"min_samples_split": [2,0.01]},  
-        "Logistic Regression": {"C": [1, 10]}
+        "Logistic Regression": {"C": [1, 10], "solver": ["liblinear"]}
     }
 }
