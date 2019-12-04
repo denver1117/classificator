@@ -11,7 +11,7 @@ import os
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import Imputer
+from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 __all__ = ["CombinedEstimator"]
@@ -82,7 +82,7 @@ class CombinedEstimator(TransformerMixin, BaseEstimator):
             self._load_model(loc)
             for loc in self.model_locs]
         self.estimator = Pipeline(steps=[
-            ("imputer", Imputer()),
+            ("imputer", SimpleImputer()),
             ("clf", RandomForestClassifier(
                 n_estimators=self.n_estimators, 
                 min_samples_split=self.min_samples_split,
