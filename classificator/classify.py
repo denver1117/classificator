@@ -14,9 +14,8 @@ import shutil
 
 from scipy.sparse import hstack, csr_matrix
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import (
-     Imputer, OneHotEncoder, LabelEncoder, 
-     MinMaxScaler)
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_selection import SelectFpr
@@ -558,7 +557,7 @@ class Sparsify(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
         """ Return instance """
         
-        self.imputer = Imputer(strategy=self.strategy)
+        self.imputer = SimpleImputer(strategy=self.strategy)
         X_imp = self.imputer.fit_transform([[self._force_float(x)] for x in X])
         if self.scale:
             self.scaler = MinMaxScaler(feature_range=(1, 100)).fit(X_imp)    
