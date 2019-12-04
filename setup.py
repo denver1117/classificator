@@ -18,6 +18,6 @@ setup(name='classificator',
           'pandas>=0.18.0',
           'numpy>=1.13.1',
           'scipy>=0.17.0',
-          'scikit-learn>=0.21.3',
+          'scikit-learn>=0.21.0',
           'boto3>=1.4.0'
       ])
